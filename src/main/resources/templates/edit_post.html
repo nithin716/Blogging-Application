@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Post</title>
+
+    <!-- CKEditor 5 CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px 35px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+            width: 750px;
+            max-width: 90%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            margin-top: 15px;
+            display: block;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 14px;
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 6px rgba(40, 167, 69, 0.3);
+        }
+
+        button {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(33, 136, 56, 0.3);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Edit Post</h2>
+
+        <!-- Form for editing post -->
+        <form th:action="@{/edit/{id}(id=${post.id})}" th:object="${post}" method="post" id="editPostForm">
+            <label for="title">Title</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="Enter post title" required />
+
+            <label for="description">Short Description</label>
+            <input type="text" id="description" th:field="*{description}" placeholder="Enter post short description" required />
+
+            <label for="content">Content</label>
+            <textarea id="content" th:field="*{content}" placeholder="Enter post content"></textarea>
+
+            <button type="submit">Update Post</button>
+        </form>
+
+        <div class="back-link">
+            <a th:href="@{/dashboard}">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        let editorInstance;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ClassicEditor
+                .create(document.querySelector('#content'))
+                .then(editor => {
+                    editorInstance = editor;
+                    // Load initial Thymeleaf value into editor
+                    const initialValue = document.querySelector('#content').value;
+                    editor.setData(initialValue);
+                })
+                .catch(error => {
+                    console.error("CKEditor initialization failed:", error);
+                });
+
+            document.getElementById('editPostForm').addEventListener('submit', function (e) {
+                if (editorInstance) {
+                    const contentData = editorInstance.getData().trim();
+                    if (!contentData) {
+                        alert("Content is required.");
+                        e.preventDefault(); // Stop form submission
+                        return;
+                    }
+                    document.querySelector('#content').value = contentData;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
